@@ -6,7 +6,7 @@ import {Activity} from '../../models/activity';
 
 interface Props {
   activity: Activity;
-  onSelect: (id: string, title: string) => void;
+  onSelect: (activity: Activity) => void;
 }
 
 function ActivityItem({activity, onSelect}: Props) {
@@ -37,11 +37,14 @@ function ActivityItem({activity, onSelect}: Props) {
   return (
     <Pressable
       style={({pressed}) => [styles.item, pressed && styles.pressed]}
-      onPress={() => onSelect(activity.id, activity.title)}>
+      onPress={() => onSelect(activity)}>
       <Image style={styles.image} source={path} />
       <View style={styles.info}>
         <Text style={styles.title}>{activity.title}</Text>
-        <Text style={styles.title}>{activity.date}</Text>
+        <Text style={styles.date}>{activity.date}</Text>
+      </View>
+      <View style={styles.markerContainer}>
+        <Text style={styles.category}>{activity.category}</Text>
       </View>
     </Pressable>
   );
@@ -79,8 +82,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: Colors.gray700,
   },
-  address: {
-    fontSize: 12,
+  date: {
+    fontSize: 14,
+    color: Colors.gray700,
+  },
+  markerContainer: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    padding: 10,
+    borderWidth: 1.5,
+    borderRadius: 10,
+    backgroundColor: '#af79b8',
+    elevation: 2,
+    shadowColor: 'black',
+    shadowOpacity: 0.15,
+    shadowOffset: {width: 1, height: 1},
+    shadowRadius: 2,
+  },
+  category: {
+    fontSize: 15,
     color: Colors.gray700,
   },
 });
