@@ -8,19 +8,15 @@ import ActivityItem from './ActivityItem';
 
 interface Props {
   activities: Activity[];
-  isRefreshing: boolean;
-  onRefresh: () => Promise<void>;
 }
 
-function ActivityList({activities, isRefreshing, onRefresh}: Props) {
+function ActivityList({activities}: Props) {
   function selectedPlaceHandler(activity: Activity) {
     navigation.navigate('ActivityDetail', {activity});
   }
 
   return (
     <FlatList
-      onRefresh={onRefresh}
-      refreshing={isRefreshing}
       style={styles.list}
       data={activities}
       renderItem={({item}) => (

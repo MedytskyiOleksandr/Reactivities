@@ -1,40 +1,33 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
-import {ActivityIndicator, StyleSheet} from 'react-native';
 
-import {Activity} from '../models/activity';
-import agent from '../api/Axios';
 import ActivityList from '../components/activtities/ActivityList';
 import {Colors} from '../constants/Colors';
+import {useAppDispatch, useAppSelector} from '../redux/store/store';
+import {fetchActivities} from '../redux/slices/ActionCreators';
 
 function Activities() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const {activities, isLoading, error} = useAppSelector(
+    state => state.activityReducer,
+  );
+  const dispatch = useAppDispatch();
 
   const isFocused = useIsFocused();
 
-  const loadActivities = useCallback(async () => {
-    setIsRefreshing(true);
-    await agent.Activities.list().then(responce => {
-      let activitiesArray: Activity[] = [];
-      responce.forEach(activity => {
-        activity.date = activity.date.split('T')[0];
-        activitiesArray.push(activity);
-      });
-      setActivities(activitiesArray);
-    });
-    setIsRefreshing(false);
-  }, []);
-
   useEffect(() => {
-    setIsLoading(true);
     if (isFocused) {
-      loadActivities().then(() => {
-        setIsLoading(false);
-      });
+      dispatch(fetchActivities());
     }
-  }, [isFocused, loadActivities]);
+  }, [dispatch, isFocused]);
+
+  if (error) {
+    return (
+      <View>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -46,13 +39,7 @@ function Activities() {
     );
   }
 
-  return (
-    <ActivityList
-      activities={activities}
-      isRefreshing={isRefreshing}
-      onRefresh={loadActivities}
-    />
-  );
+  return <ActivityList activities={activities} />;
 }
 
 export default Activities;

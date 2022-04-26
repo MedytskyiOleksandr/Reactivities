@@ -9,10 +9,17 @@
  */
 
 import React from 'react';
+import {Provider} from 'react-redux';
+
 import ActivitiesNavigator from './src/navigation/ActivityNavigator';
+import store from './src/redux/store/store';
 
 const App = () => {
-  return <ActivitiesNavigator />;
+  return (
+    <Provider store={store}>
+      <ActivitiesNavigator />
+    </Provider>
+  );
 };
 
 export default App;

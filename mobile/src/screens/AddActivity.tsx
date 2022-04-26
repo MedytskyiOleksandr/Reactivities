@@ -9,13 +9,17 @@ import {
   TextInputChangeEventData,
 } from 'react-native';
 import DatePicker from 'react-native-date-picker';
-import uuid from 'react-native-uuid';
 
-import agent from '../api/Axios';
 import * as navigation from '../navigation/Navigation';
 import {Colors} from '../constants/Colors';
 import {Activity} from '../models/activity';
 import CustomButton from '../components/UI/CustomButton';
+import {useAppDispatch, useAppSelector} from '../redux/store/store';
+import {
+  createActivity,
+  deleteActivity,
+  editActivity,
+} from '../redux/slices/ActionCreators';
 
 interface Props {
   route: {
@@ -36,10 +40,13 @@ function AddActivity({route}: Props) {
     street: '',
   };
 
+  const {isLoading, isDeleting} = useAppSelector(
+    state => state.activityReducer,
+  );
+  const dispatch = useAppDispatch();
+
   const [activity, setActivity] = useState<Activity>(initialState);
   const [date, setDate] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   function onChangeHandler(
     keyValue: string,
@@ -50,27 +57,22 @@ function AddActivity({route}: Props) {
   }
 
   async function saveActivityHandler() {
-    setIsLoading(true);
     if (activity.id) {
-      await agent.Activities.update(activity).then(() => {
+      activity.date = date.toISOString();
+      dispatch(editActivity(activity)).then(() => {
         navigation.navigate('ActivityDetail', {activity});
       });
     } else {
-      activity.id = uuid.v4().toString();
-      activity.date = date.toISOString().split('T')[0];
-      setActivity(activity);
-      await agent.Activities.create(activity).then(() =>
-        navigation.navigate('Activities'),
-      );
+      activity.date = date.toISOString();
+      dispatch(createActivity(activity)).then(() => {
+        navigation.navigate('Activities', activity);
+      });
     }
-    setIsLoading(false);
   }
 
   async function deleteActivityHandler() {
-    setIsDeleting(true);
-    await agent.Activities.delete(activity.id).then(() => {
+    dispatch(deleteActivity(activity.id)).then(() => {
       navigation.navigate('Activities');
-      setIsDeleting(false);
     });
   }
 

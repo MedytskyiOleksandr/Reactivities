@@ -10,7 +10,6 @@ interface Props {
 }
 
 function ActivityItem({activity, onSelect}: Props) {
-  // const [name, setName] = useState('');
   let name = activity.category;
   let path = require('../../../assets/categoryImages/culture.jpg');
   switch (name) {
