@@ -58,12 +58,10 @@ function AddActivity({route}: Props) {
 
   async function saveActivityHandler() {
     if (activity.id) {
-      activity.date = date.toISOString();
       dispatch(editActivity(activity)).then(() => {
         navigation.navigate('ActivityDetail', {activity});
       });
     } else {
-      activity.date = date.toISOString();
       dispatch(createActivity(activity)).then(() => {
         navigation.navigate('Activities', activity);
       });
