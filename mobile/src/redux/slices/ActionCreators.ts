@@ -52,3 +52,15 @@ export const deleteActivity = createAsyncThunk(
     }
   },
 );
+
+export const activityDetails = createAsyncThunk(
+  'activities/details',
+  async (id: string, thunkAPI) => {
+    try {
+      const respone = await agent.Activities.details(id);
+      return respone;
+    } catch (error) {
+      thunkAPI.rejectWithValue(error);
+    }
+  },
+);

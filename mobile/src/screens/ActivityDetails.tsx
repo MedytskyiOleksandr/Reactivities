@@ -1,14 +1,8 @@
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  ScrollView,
-  ImageSourcePropType,
-} from 'react-native';
+import {Image, StyleSheet, Text, ScrollView} from 'react-native';
+
 import {Activity} from '../models/activity';
-const CultureImg = require('../../assets/categoryImages/culture.jpg');
-const images: {[name: string]: ImageSourcePropType} = {culture: CultureImg};
+import {images} from '../assets/index';
 
 interface Props {
   route: {
@@ -21,27 +15,6 @@ interface Props {
 function ActivityDetails({route}: Props) {
   let name = route.params.activity.category;
   let path = images[name] || images.culture;
-  //let path = require('../../assets/categoryImages/culture.jpg');
-  // switch (name) {
-  //   case 'culture':
-  //     path = require('../../assets/categoryImages/culture.jpg');
-  //     break;
-  //   case 'film':
-  //     path = require('../../assets/categoryImages/film.jpg');
-  //     break;
-  //   case 'music':
-  //     path = require('../../assets/categoryImages/music.jpg');
-  //     break;
-  //   case 'travel':
-  //     path = require('../../assets/categoryImages/travel.jpg');
-  //     break;
-  //   case 'drinks':
-  //     path = require('../../assets/categoryImages/drinks.jpg');
-  //     break;
-  //   case 'food':
-  //     path = require('../../assets/categoryImages/food.jpg');
-  //     break;
-  // }
 
   return (
     <ScrollView>
