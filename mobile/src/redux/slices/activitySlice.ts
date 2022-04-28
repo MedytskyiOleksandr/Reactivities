@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Activity} from '../../models/activity';
 import {
+  activityDetails,
   createActivity,
   deleteActivity,
   editActivity,
@@ -83,6 +84,21 @@ export const activitiesSlice = createSlice({
     },
     [deleteActivity.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isDeleting = false;
+      state.error = action.payload;
+    },
+    [activityDetails.pending.type]: state => {
+      state.isLoading = true;
+    },
+    [activityDetails.fulfilled.type]: (
+      state,
+      action: PayloadAction<Activity>,
+    ) => {
+      state.isLoading = false;
+      state.error = '';
+      state.selectedActivity = action.payload;
+    },
+    [activityDetails.rejected.type]: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
       state.error = action.payload;
     },
   },
