@@ -1,15 +1,26 @@
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import React, { ChangeEvent, useState } from "react";
+import { useParams, useHistory, Link } from "react-router-dom";
 import { Button, Form, Segment } from "semantic-ui-react";
+import { v4 as uuid } from "uuid";
+
 import { useStore } from "../../../app/stores/store";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
 function ActivityForm() {
   const { activityStore } = useStore();
+  const {
+    createActivity,
+    editActivity,
+    loading,
+    loadActivity,
+    loadingInitial,
+  } = activityStore;
 
-  const { selectedActivity, closeForm, createActivity, editActivity, loading } =
-    activityStore;
+  const { id } = useParams<{ id: string }>();
+  const history = useHistory();
 
-  const initialState = selectedActivity ?? {
+  const [activity, setActivity] = useState({
     id: "",
     title: "",
     date: "",
@@ -17,12 +28,30 @@ function ActivityForm() {
     category: "",
     city: "",
     street: "",
-  };
+  });
 
-  const [activity, setActivity] = useState(initialState);
+  useEffect(() => {
+    if (id) {
+      loadActivity(id).then((activity) => {
+        setActivity(activity!);
+      });
+    }
+  }, [id, loadActivity]);
 
   function submitHandler() {
-    activity.id ? editActivity(activity) : createActivity(activity);
+    if (activity.id.length === 0) {
+      let newActivity = {
+        ...activity,
+        id: uuid(),
+      };
+      createActivity(newActivity).then(() => {
+        history.push(`/activities/${newActivity.id}`);
+      });
+    } else {
+      editActivity(activity).then(() => {
+        history.push(`/activities/${activity.id}`);
+      });
+    }
   }
 
   function onChangeHandler(
@@ -30,6 +59,10 @@ function ActivityForm() {
   ) {
     const { name, value } = event.target;
     setActivity({ ...activity, [name]: value });
+  }
+
+  if (loadingInitial) {
+    return <LoadingComponent content="Loading activity..." />;
   }
 
   return (
@@ -80,7 +113,8 @@ function ActivityForm() {
           content="Submit"
         />
         <Button
-          onClick={closeForm}
+          as={Link}
+          to="/activities"
           floated="right"
           type="button"
           content="Cancel"
