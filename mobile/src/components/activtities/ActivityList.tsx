@@ -1,6 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import {StyleSheet, FlatList} from 'react-native';
 import {Activity} from '../../models/activity';
 import * as navigation from '../../navigation/Navigation';
 

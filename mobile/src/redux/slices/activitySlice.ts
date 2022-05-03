@@ -53,7 +53,7 @@ export const activitiesSlice = createSlice({
     ) => {
       state.isLoading = false;
       state.error = '';
-      state.activities = [...state.activities, action.payload];
+      state.activities.push(action.payload);
     },
     [createActivity.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
@@ -65,9 +65,12 @@ export const activitiesSlice = createSlice({
     [editActivity.fulfilled.type]: (state, action: PayloadAction<Activity>) => {
       state.isLoading = false;
       state.error = '';
-      state.activities = [...state.activities, action.payload];
+      const index = state.activities.findIndex(
+        activity => activity.id === action.payload.id,
+      );
+      state.activities[index] = {...state.activities[index], ...action.payload};
     },
-    [editActivity.fulfilled.type]: (state, action: PayloadAction<string>) => {
+    [editActivity.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.error = action.payload;
     },
@@ -76,11 +79,14 @@ export const activitiesSlice = createSlice({
     },
     [deleteActivity.fulfilled.type]: (
       state,
-      action: PayloadAction<Activity[]>,
+      action: PayloadAction<Activity>,
     ) => {
       state.isDeleting = false;
       state.error = '';
-      state.activities = action.payload;
+      let index = state.activities.findIndex(
+        activity => activity.id === action.payload.id,
+      );
+      state.activities.splice(index, 1);
     },
     [deleteActivity.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isDeleting = false;

@@ -58,12 +58,13 @@ function AddActivity({route}: Props) {
 
   async function saveActivityHandler() {
     if (activity.id) {
+      activity.date = date;
       dispatch(editActivity(activity)).then(() => {
         navigation.navigate('ActivityDetail', {activity});
       });
     } else {
       dispatch(createActivity(activity)).then(() => {
-        navigation.navigate('Activities', activity);
+        navigation.goBack();
       });
     }
   }

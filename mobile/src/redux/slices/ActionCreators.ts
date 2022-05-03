@@ -36,6 +36,7 @@ export const editActivity = createAsyncThunk(
   async (activity: Activity, thunkAPI) => {
     try {
       await agent.Activities.update(activity);
+      return {activity};
     } catch (error) {
       thunkAPI.rejectWithValue(error);
     }
@@ -47,6 +48,7 @@ export const deleteActivity = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       await agent.Activities.delete(id);
+      return {id};
     } catch (error) {
       thunkAPI.rejectWithValue(error);
     }
