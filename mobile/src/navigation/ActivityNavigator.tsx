@@ -9,6 +9,7 @@ import {Activity} from '../models/activity';
 import {Colors} from '../constants/Colors';
 import IconButton from '../components/UI/IconButton';
 import AddActivity from '../screens/AddActivity';
+import {useAppSelector} from '../redux/store/store';
 
 type RootStackParamList = {
   Activities: undefined;
@@ -19,6 +20,7 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 function ActivitiesNavigator() {
+  const {selectedActivity} = useAppSelector(state => state.activityReducer);
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
@@ -49,14 +51,14 @@ function ActivitiesNavigator() {
         <Stack.Screen
           name="ActivityDetail"
           component={ActivityDetails}
-          options={({route}) => ({
-            title: route.params.activity.title,
+          options={() => ({
+            title: selectedActivity!.title,
             headerRight: ({tintColor}) => (
               <IconButton
                 icon="edit"
                 size={24}
                 color={tintColor}
-                onPress={() => navigate('AddActivity', route.params)}
+                onPress={() => navigate('AddActivity')}
               />
             ),
           })}
@@ -64,8 +66,8 @@ function ActivitiesNavigator() {
         <Stack.Screen
           name="AddActivity"
           component={AddActivity}
-          options={({route}) => ({
-            title: route.params.activity?.id ? 'Edit Activity' : 'Add Activity',
+          options={() => ({
+            title: selectedActivity?.id ? 'Edit Activity' : 'Add Activity',
           })}
         />
       </Stack.Navigator>

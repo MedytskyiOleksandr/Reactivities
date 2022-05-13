@@ -21,16 +21,13 @@ import {
   editActivity,
 } from '../redux/slices/ActionCreators';
 
-interface Props {
-  route: {
-    params: {
-      activity: Activity;
-    };
-  };
-}
+function AddActivity() {
+  const {isLoading, isDeleting, selectedActivity} = useAppSelector(
+    state => state.activityReducer,
+  );
+  const dispatch = useAppDispatch();
 
-function AddActivity({route}: Props) {
-  const initialState = route.params.activity ?? {
+  const initialState = selectedActivity ?? {
     id: '',
     title: '',
     date: '',
@@ -39,11 +36,6 @@ function AddActivity({route}: Props) {
     city: '',
     street: '',
   };
-
-  const {isLoading, isDeleting} = useAppSelector(
-    state => state.activityReducer,
-  );
-  const dispatch = useAppDispatch();
 
   const [activity, setActivity] = useState<Activity>(initialState);
   const [date, setDate] = useState(new Date());
@@ -58,7 +50,6 @@ function AddActivity({route}: Props) {
 
   async function saveActivityHandler() {
     if (activity.id) {
-      activity.date = date;
       dispatch(editActivity(activity)).then(() => {
         navigation.navigate('ActivityDetail', {activity});
       });

@@ -39,6 +39,7 @@ export const activitiesSlice = createSlice({
       state.isLoading = false;
       state.error = '';
       state.activities = action.payload;
+      state.selectedActivity = undefined;
     },
     [fetchActivities.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isLoading = false;

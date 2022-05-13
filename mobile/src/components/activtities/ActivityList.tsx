@@ -1,34 +1,45 @@
 import React from 'react';
-import {StyleSheet, FlatList} from 'react-native';
-import {Activity} from '../../models/activity';
-import * as navigation from '../../navigation/Navigation';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 
+import {Colors} from '../../constants/Colors';
+import {Activity} from '../../models/activity';
+import {useAppSelector} from '../../redux/store/store';
 import ActivityItem from './ActivityItem';
 
-interface Props {
-  activities: Activity[];
-}
+function ActivityList() {
+  const {activities} = useAppSelector(state => state.activityReducer);
 
-function ActivityList({activities}: Props) {
-  function selectedPlaceHandler(activity: Activity) {
-    navigation.navigate('ActivityDetail', {activity});
-  }
+  const groupedActivities = Object.entries(
+    activities.reduce((activitiesArray, activity) => {
+      const date = activity.date.split('T')[0];
+      activitiesArray[date] = activitiesArray[date]
+        ? [...activitiesArray[date], activity]
+        : [activity];
+      return activitiesArray;
+    }, {} as {[key: string]: Activity[]}),
+  );
 
   return (
-    <FlatList
-      style={styles.list}
-      data={activities}
-      renderItem={({item}) => (
-        <ActivityItem activity={item} onSelect={selectedPlaceHandler} />
-      )}
-    />
+    <ScrollView>
+      {groupedActivities.map(([group, activities2]) => (
+        <View key={group}>
+          <Text style={styles.headerText}>{group}</Text>
+          {activities2.map(activity => (
+            <ActivityItem key={activity.id} activity={activity} />
+          ))}
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
 export default ActivityList;
 
 const styles = StyleSheet.create({
-  list: {
+  headerText: {
     marginHorizontal: 8,
+    marginTop: 12,
+    color: Colors.primary500,
+    fontSize: 20,
   },
 });

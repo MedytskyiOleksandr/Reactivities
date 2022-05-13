@@ -8,9 +8,7 @@ import {useAppDispatch, useAppSelector} from '../redux/store/store';
 import {fetchActivities} from '../redux/slices/ActionCreators';
 
 function Activities() {
-  const {activities, isLoading, error} = useAppSelector(
-    state => state.activityReducer,
-  );
+  const {isLoading, error} = useAppSelector(state => state.activityReducer);
   const dispatch = useAppDispatch();
 
   const isFocused = useIsFocused();
@@ -39,7 +37,7 @@ function Activities() {
     );
   }
 
-  return <ActivityList activities={activities} />;
+  return <ActivityList />;
 }
 
 export default Activities;

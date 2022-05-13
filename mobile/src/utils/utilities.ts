@@ -4,4 +4,5 @@ export function sortActivitiesByDate(activities: Activity[]) {
   activities.sort((a, b) => {
     return Date.parse(a.date) - Date.parse(b.date);
   });
+  return activities;
 }
