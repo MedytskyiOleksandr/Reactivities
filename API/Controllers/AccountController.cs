@@ -85,7 +85,7 @@ namespace API.Controllers
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
             return CreateUserObject(user);
-        }
+        } 
 
         private UserDto CreateUserObject(AppUser user)
         {
