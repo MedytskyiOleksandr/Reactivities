@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { Activity } from "../models/activity";
+import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 
 const sleep = (delay: number) => {
@@ -12,10 +13,16 @@ const sleep = (delay: number) => {
 
 axios.defaults.baseURL = "http://127.0.0.1:5000/api";
 
+axios.interceptors.request.use((config) => {
+  const token = store.commonStore.token;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 axios.interceptors.response.use(
-  async (responce) => {
+  async (response) => {
     await sleep(1000);
-    return responce;
+    return response;
   },
   (error: AxiosError) => {
     const { data, status, config } = error.response!;
@@ -56,14 +63,14 @@ axios.interceptors.response.use(
   }
 );
 
-const responceBody = <T>(responce: AxiosResponse<T>) => responce.data;
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
-  get: <T>(url: string) => axios.get<T>(url).then(responceBody),
+  get: <T>(url: string) => axios.get<T>(url).then(responseBody),
   post: <T>(url: string, body: {}) =>
-    axios.post<T>(url, body).then(responceBody),
-  put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responceBody),
-  delete: <T>(url: string) => axios.delete<T>(url).then(responceBody),
+    axios.post<T>(url, body).then(responseBody),
+  put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
+  delete: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 };
 
 const Activities = {
@@ -75,8 +82,16 @@ const Activities = {
   delete: (id: string) => requests.delete<void>(`/activities/${id}`),
 };
 
+const Account = {
+  current: () => requests.get<User>("/account"),
+  login: (user: UserFormValues) => requests.post<User>("/account/login", user),
+  register: (user: UserFormValues) =>
+    requests.post<User>("/account/register", user),
+};
+
 const agent = {
   Activities,
+  Account,
 };
 
 export default agent;

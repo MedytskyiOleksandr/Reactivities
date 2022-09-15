@@ -7,6 +7,7 @@ interface Props {
   name: string;
   label?: string;
   rows?: number;
+  type?: string;
 }
 
 function TextInput(props: Props) {
