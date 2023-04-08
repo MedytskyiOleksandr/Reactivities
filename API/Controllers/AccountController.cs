@@ -46,7 +46,7 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
-            if(await _userManager.Users.AnyAsync(user => user.Email == registerDto.Email))
+            if (await _userManager.Users.AnyAsync(user => user.Email == registerDto.Email))
             {
                 ModelState.AddModelError("email", "Email already taken");
                 return ValidationProblem();
@@ -66,13 +66,12 @@ namespace API.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
-
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 return CreateUserObject(user);
             }
 
-            return BadRequest("Some problems occured while registering"); 
+            return BadRequest(result.Errors  );
         }
 
         [Authorize]
@@ -82,7 +81,7 @@ namespace API.Controllers
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
             return CreateUserObject(user);
-        } 
+        }
 
         private UserDto CreateUserObject(AppUser user)
         {
