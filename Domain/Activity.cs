@@ -21,5 +21,9 @@ namespace Domain
         public string City { get; set; }
 
         public string Street { get; set; }
+
+        public bool IsCancelled { get; set; }
+
+        public ICollection<ActivityAttendee> Attendees { get; set; } = new List<ActivityAttendee>();
     }
 }
