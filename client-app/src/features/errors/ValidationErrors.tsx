@@ -1,22 +1,24 @@
-import React from "react";
+import { AxiosError } from "axios";
 import { Message } from "semantic-ui-react";
 
 interface Props {
-  errors: any;
+  errors: AxiosError | any;
 }
 
 function ValidationErrors({ errors }: Props) {
   return (
     <Message error>
-      {errors && (
+      {errors.isAxiosError ? (
         <Message.List>
-          {errors.map((error: any, i: any) => (
-            <>
-              <Message.Item key={i}>{error}</Message.Item>
-            </>
-          ))}
+          {errors.response.data.map(
+            (error: { code: string; description: string }, index: number) => (
+              <>
+                <Message.Item key={index}>{error.description}</Message.Item>
+              </>
+            )
+          )}
         </Message.List>
-      )}
+      ) : errors}
     </Message>
   );
 }

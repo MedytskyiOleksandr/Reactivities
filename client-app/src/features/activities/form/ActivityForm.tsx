@@ -12,30 +12,19 @@ import TextInput from "../../../app/common/form/TextInput";
 import SelectInput from "../../../app/common/form/SelectInput";
 import { categoryOptions } from "../../../app/common/options/categoryOptions";
 import DateInput from "../../../app/common/form/DateIntup";
-import { Activity } from "../../../app/models/activity";
+import { ActivityFormValues } from "../../../app/models/activity";
 
 function ActivityForm() {
   const { activityStore } = useStore();
-  const {
-    createActivity,
-    editActivity,
-    loading,
-    loadActivity,
-    loadingInitial,
-  } = activityStore;
+  const { createActivity, editActivity, loadActivity, loadingInitial } =
+    activityStore;
 
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
-  const [activity, setActivity] = useState<Activity>({
-    id: "",
-    title: "",
-    date: null,
-    description: "",
-    category: "",
-    city: "",
-    street: "",
-  });
+  const [activity, setActivity] = useState<ActivityFormValues>(
+    new ActivityFormValues()
+  );
 
   const validationSchema = Yup.object({
     title: Yup.string().required("The activity title is required!"),
@@ -49,13 +38,13 @@ function ActivityForm() {
   useEffect(() => {
     if (id) {
       loadActivity(id).then((activity) => {
-        setActivity(activity!);
+        setActivity(new ActivityFormValues(activity));
       });
     }
   }, [id, loadActivity]);
 
-  function submitFormHandler(activity: Activity) {
-    if (activity.id.length === 0) {
+  function submitFormHandler(activity: ActivityFormValues) {
+    if (!activity.id) {
       let newActivity = {
         ...activity,
         id: uuid(),
@@ -113,7 +102,7 @@ function ActivityForm() {
               <TextInput placeholder="Street" name="street" />
               <Button
                 disabled={isSubmitting || !dirty || !isValid}
-                loading={loading}
+                loading={isSubmitting}
                 floated="right"
                 positive
                 type="submit"
