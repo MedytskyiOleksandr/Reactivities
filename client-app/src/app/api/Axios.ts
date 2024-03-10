@@ -1,9 +1,10 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/activity";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
+import { Photo, Profile } from "../models/profile";
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -11,7 +12,7 @@ const sleep = (delay: number) => {
   });
 };
 
-axios.defaults.baseURL = "http://127.0.0.1:5000/api";
+axios.defaults.baseURL = "http://127.0.0.1:4200/api";
 
 axios.interceptors.request.use((config) => {
   const token = store.commonStore.token;
@@ -67,8 +68,8 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
   get: <T>(url: string) => axios.get<T>(url).then(responseBody),
-  post: <T>(url: string, body: {}) =>
-    axios.post<T>(url, body).then(responseBody),
+  post: <T>(url: string, body?: {}, config?: AxiosRequestConfig) =>
+    axios.post<T>(url, body, config).then(responseBody),
   put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
   delete: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 };
@@ -91,9 +92,20 @@ const Account = {
     requests.post<User>("/account/register", user),
 };
 
+const Profiles = {
+  get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+  uploadPhoto: (formData: FormData) =>
+    requests.post<Photo>("/photos", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+  setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`),
+  deletePhoto: (id: string) => requests.delete(`/photos/${id}`),
+};
+
 const agent = {
   Activities,
   Account,
+  Profiles,
 };
 
 export default agent;
