@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using API.DTOs;
 using API.Services;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -73,15 +71,22 @@ namespace API.Controllers
                 return CreateUserObject(user);
             }
 
-            return BadRequest(result.Errors  );
+            return BadRequest(result.Errors);
         }
 
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
-            var user = await _userManager.Users.Include(p => p.Photos)
-                .FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
+            var users = await _userManager.Users.Include(p => p.Photos)
+            .ToListAsync();
+
+            var user = users.FirstOrDefault(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
+
+            if (user == null)
+            {
+                return NotFound();
+            }
 
             return CreateUserObject(user);
         }
