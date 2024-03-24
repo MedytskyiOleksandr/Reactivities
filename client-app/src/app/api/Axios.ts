@@ -12,7 +12,7 @@ const sleep = (delay: number) => {
   });
 };
 
-axios.defaults.baseURL = "http://127.0.0.1:4200/api";
+axios.defaults.baseURL = "http://127.0.0.1:5000/api";
 
 axios.interceptors.request.use((config) => {
   const token = store.commonStore.token;
