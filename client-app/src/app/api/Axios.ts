@@ -1,10 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/activity";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 import { Photo, Profile } from "../models/profile";
+import { router } from "../router/Routes";
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -12,28 +12,28 @@ const sleep = (delay: number) => {
   });
 };
 
-axios.defaults.baseURL = "http://127.0.0.1:4200/api";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 axios.interceptors.request.use((config) => {
   const token = store.commonStore.token;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
 axios.interceptors.response.use(
   async (response) => {
-    await sleep(1000);
+    if (import.meta.env.DEV) await sleep(1000);
     return response;
   },
   (error: AxiosError) => {
-    const { data, status, config } = error.response!;
+    const { data, status, config } = error.response as AxiosResponse;
     switch (status) {
       case 400: {
         if (typeof data === "string") {
           toast.error(data);
         }
         if (config.method === "get" && data.errors.hasOwnProperty("id")) {
-          history.push("/not-found");
+          router.navigate("/not-found");
         }
         if (data.errors) {
           const modalStateErrors = [];
@@ -51,12 +51,12 @@ axios.interceptors.response.use(
         break;
       }
       case 404: {
-        history.push("/not-found");
+        router.navigate("/not-found");
         break;
       }
       case 500: {
         store.commonStore.setServerError(data);
-        history.push("/server-error");
+        router.navigate("/server-error");
         break;
       }
     }

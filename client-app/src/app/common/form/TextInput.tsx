@@ -1,4 +1,3 @@
-import React from "react";
 import { useField } from "formik";
 import { Form, Label } from "semantic-ui-react";
 
@@ -17,7 +16,11 @@ function TextInput(props: Props) {
     <Form.Field error={meta.touched && !!meta.error}>
       <label>{props.label}</label>
       {props.rows ? (
-        <textarea {...field} {...props} />
+        <textarea
+          style={{ resize: "none", width: "100%" }}
+          {...field}
+          {...props}
+        />
       ) : (
         <input {...field} {...props} />
       )}

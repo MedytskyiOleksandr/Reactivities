@@ -185,12 +185,16 @@ export default class ActivityStore {
         this.activityRegistry.set(
           this.selectedActivity!.id,
           this.selectedActivity!
-        ); 
+        );
       });
     } catch (error) {
       console.log(error);
     } finally {
       runInAction(() => (this.loading = false));
     }
+  };
+
+  clearSelectedActivity = () => {
+    this.selectedActivity = undefined;
   };
 }
