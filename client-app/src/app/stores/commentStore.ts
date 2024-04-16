@@ -18,9 +18,12 @@ export default class CommentStore {
   createHubConnection = (activityId: string) => {
     if (store.activityStore.selectedActivity) {
       this.hubConnection = new HubConnectionBuilder()
-        .withUrl("http://localhost:4200/comments?activityId=" + activityId, {
-          accessTokenFactory: () => store.userStore.user?.token!,
-        })
+        .withUrl(
+          import.meta.env.VITE_COMMENT_URL + "?activityId=" + activityId,
+          {
+            accessTokenFactory: () => store.userStore.user?.token!,
+          }
+        )
         .withAutomaticReconnect()
         .configureLogging(LogLevel.Information)
         .build();
@@ -32,11 +35,16 @@ export default class CommentStore {
         );
 
       this.hubConnection.on("LoadComments", (comments: Comment[]) => {
-        runInAction(() => (this.comments = comments));
+        runInAction(() => {
+          comments.forEach((comment) => {
+            comment.createdAt = new Date(comment.createdAt + "Z");
+          });
+          this.comments = comments;
+        });
       });
 
-      this.hubConnection.on("ReceiveComment", (comment: Comment) => {
-        runInAction(() => this.comments.push(comment));
+      this.hubConnection.on("ReceiveComments", (comment: Comment) => {
+        runInAction(() => this.comments.unshift(comment));
       });
     }
   };
@@ -45,6 +53,16 @@ export default class CommentStore {
     this.hubConnection
       ?.stop()
       .catch((error) => console.log("Error stopping connection:", error));
+  };
+
+  addComment = async (values: { body: string; activityId?: string }) => {
+    values.activityId = store.activityStore.selectedActivity?.id;
+
+    try {
+      await this.hubConnection?.invoke("SendComment", values);
+    } catch (error) {
+      console.log("Error sending comment:", error);
+    }
   };
 
   clearComments = () => {

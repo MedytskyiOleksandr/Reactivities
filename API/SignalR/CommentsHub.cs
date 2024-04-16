@@ -19,7 +19,7 @@ namespace API.SignalR
             var comment = await _mediator.Send(command);
 
             await Clients.Group(command.ActivityId.ToString())
-                .SendAsync("ReceivedComment", comment.Value);
+                .SendAsync("ReceiveComments", comment.Value);
         }
 
         public override async Task OnConnectedAsync()

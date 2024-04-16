@@ -1,6 +1,6 @@
 export interface Comment {
   id: number;
-  createdAd: Date;
+  createdAt: Date;
   body: string;
   username: string;
   displayName: string;

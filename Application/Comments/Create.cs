@@ -59,7 +59,7 @@ namespace Application.Comments
 
                 activity.Comments.Add(comment);
 
-                var success = await _context.SaveChangesAsync() > 1;
+                var success = await _context.SaveChangesAsync() > 0;
 
                 if (success) return Result<Comments.CommentDto>.Success(_mapper.Map<Comments.CommentDto>(comment));
 
