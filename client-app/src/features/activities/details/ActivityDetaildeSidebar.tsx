@@ -1,4 +1,3 @@
-
 import { Segment, List, Label, Item, Image } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
@@ -10,7 +9,7 @@ interface Props {
 }
 
 function ActivityDetailedSidebar({ attendees, host }: Props) {
-  if(!attendees || !host) return null;
+  if (!attendees || !host) return null;
   return (
     <>
       <Segment
@@ -43,7 +42,9 @@ function ActivityDetailedSidebar({ attendees, host }: Props) {
                     {attendee.username}
                   </Link>
                 </Item.Header>
-                <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                {attendee.following && (
+                  <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                )}
               </Item.Content>
             </Item>
           ))}
