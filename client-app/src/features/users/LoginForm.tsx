@@ -13,7 +13,7 @@ function LoginForm() {
       onSubmit={(values, { setErrors }) =>
         userStore
           .login(values)
-          .catch((error) => setErrors({ error: "Invalid email of password" }))
+          .catch(() => setErrors({ error: "Invalid email of password" }))
       }
     >
       {({ handleSubmit, isSubmitting, errors }) => (

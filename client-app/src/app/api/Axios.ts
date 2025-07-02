@@ -1,10 +1,11 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { toast } from "react-toastify";
-import { Activity, ActivityFormValues } from "../models/activity";
-import { User, UserFormValues } from "../models/user";
-import { store } from "../stores/store";
-import { Photo, Profile } from "../models/profile";
-import { router } from "../router/Routes";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
+import {toast} from "react-toastify";
+import {Activity, ActivityFormValues} from "../models/activity";
+import {User, UserFormValues} from "../models/user";
+import {store} from "../stores/store";
+import {Photo, Profile} from "../models/profile";
+import {router} from "../router/Routes";
+import {PaginatedResult} from "../models/pagination.ts";
 
 const sleep = (delay: number) => {
   return new Promise((resolve) => {
@@ -22,17 +23,24 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(
   async (response) => {
+    const pagination = response.headers["pagination"];
+
+    if (pagination) {
+      response.data = new PaginatedResult(response.data, JSON.parse(pagination));
+      return response as AxiosResponse<PaginatedResult<unknown>>;
+    }
+
     if (import.meta.env.DEV) await sleep(1000);
     return response;
   },
   (error: AxiosError) => {
-    const { data, status, config } = error.response as AxiosResponse;
+    const {data, status, config} = error.response as AxiosResponse;
     switch (status) {
       case 400: {
         if (typeof data === "string") {
           toast.error(data);
         }
-        if (config.method === "get" && data.errors.hasOwnProperty("id")) {
+        if (config.method === "get" && Object.prototype.hasOwnProperty.call(data.errors, "id")) {
           router.navigate("/not-found");
         }
         if (data.errors) {
@@ -67,15 +75,15 @@ axios.interceptors.response.use(
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
-  get: <T>(url: string) => axios.get<T>(url).then(responseBody),
-  post: <T>(url: string, body?: {}, config?: AxiosRequestConfig) =>
+  get: <T>(url: string, config?: object) => axios.get<T>(url, config).then(responseBody),
+  post: <T>(url: string, body?: object, config?: AxiosRequestConfig) =>
     axios.post<T>(url, body, config).then(responseBody),
-  put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
+  put: <T>(url: string, body: object) => axios.put<T>(url, body).then(responseBody),
   delete: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 };
 
 const Activities = {
-  list: () => requests.get<Activity[]>("/activities"),
+  list: (params: URLSearchParams) => requests.get<PaginatedResult<Activity[]>>("/activities", {params}),
   details: (id: string) => requests.get<Activity>(`/activities/${id}`),
   create: (activity: ActivityFormValues) =>
     requests.post<void>("/activities", activity),
@@ -96,7 +104,7 @@ const Profiles = {
   get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
   uploadPhoto: (formData: FormData) =>
     requests.post<Photo>("/photos", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {"Content-Type": "multipart/form-data"},
     }),
   setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`),
   deletePhoto: (id: string) => requests.delete(`/photos/${id}`),

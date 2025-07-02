@@ -21,7 +21,7 @@ export default class CommentStore {
         .withUrl(
           import.meta.env.VITE_COMMENT_URL + "?activityId=" + activityId,
           {
-            accessTokenFactory: () => store.userStore.user?.token!,
+            accessTokenFactory: () => store.userStore.user?.token ?? '',
           }
         )
         .withAutomaticReconnect()

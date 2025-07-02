@@ -1,9 +1,10 @@
-import { format } from "date-fns";
-import { makeAutoObservable, runInAction } from "mobx";
+import {format} from "date-fns";
+import {makeAutoObservable, runInAction} from "mobx";
 import agent from "../api/Axios";
-import { Activity, ActivityFormValues } from "../models/activity";
-import { Profile } from "../models/profile";
-import { store } from "./store";
+import {Activity, ActivityFormValues} from "../models/activity";
+import {Profile} from "../models/profile";
+import {store} from "./store";
+import {Pagination, PagingParams} from "../models/pagination.ts";
 
 export default class ActivityStore {
   activityRegistry = new Map<string, Activity>();
@@ -11,9 +12,22 @@ export default class ActivityStore {
   editMode = false;
   loading = false;
   loadingInitial = false;
+  pagination: Pagination | null = null;
+  pagingParams = new PagingParams();
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setPagingParams = (pagingParams: PagingParams) => {
+    this.pagingParams = pagingParams;
+  }
+
+  get queryParams() {
+    const params = new URLSearchParams();
+    params.append("pageNumber", this.pagingParams.pageNumber.toString());
+    params.append("pageSize", this.pagingParams.pageSize.toString());
+    return params
   }
 
   get activitiesByDate() {
@@ -37,16 +51,21 @@ export default class ActivityStore {
   loadActivities = async () => {
     this.loadingInitial = true;
     try {
-      const activitiesArray = await agent.Activities.list();
-      activitiesArray.forEach((activity) => {
+      const result = await agent.Activities.list(this.queryParams);
+      result.data.forEach((activity) => {
         this.setActivity(activity);
       });
+      this.setPagination(result.pagination);
       this.setLoadingInitial(false);
     } catch (error) {
       console.log(error);
       this.setLoadingInitial(false);
     }
   };
+
+  setPagination = (pagination: Pagination) => {
+    this.pagination = pagination;
+  }
 
   private getActivity(id: string) {
     return this.activityRegistry.get(id);
@@ -116,7 +135,7 @@ export default class ActivityStore {
       await agent.Activities.update(activity);
       runInAction(() => {
         if (activity.id) {
-          let updatedActivity = {
+          const updatedActivity = {
             ...this.getActivity(activity.id),
             ...activity,
           };
@@ -202,9 +221,11 @@ export default class ActivityStore {
     this.activityRegistry.forEach((activity) => {
       activity.attendees.forEach((attendee) => {
         if (attendee.username === username) {
-          attendee.following
-            ? attendee.followersCount--
-            : attendee.followersCount++;
+          if (attendee.following) {
+            attendee.followersCount--;
+          } else {
+            attendee.followersCount++;
+          }
           attendee.following = !attendee.following;
         }
       });
