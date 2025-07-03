@@ -1,4 +1,4 @@
-import React from "react";
+
 import {
   Button,
   Container,
@@ -19,7 +19,7 @@ function NavigationBar() {
   return (
     <Menu inverted fixed="top">
       <Container>
-        <Menu.Item as={NavLink} to="/" exact header>
+        <Menu.Item as={NavLink} to="/" header>
           <img
             src="/assets/logo.png"
             alt="logo"
@@ -47,7 +47,7 @@ function NavigationBar() {
             <Dropdown.Menu>
               <Dropdown.Item
                 as={Link}
-                to={`/profile/${user?.username}`}
+                to={`/profiles/${user?.username}`}
                 text="My Profile"
                 icon="user"
               />

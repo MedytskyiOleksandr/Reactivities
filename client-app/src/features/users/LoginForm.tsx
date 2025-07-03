@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Formik, Form, ErrorMessage } from "formik";
 import TextInput from "../../app/common/form/TextInput";
 import { Button, Header, Label } from "semantic-ui-react";
@@ -13,7 +13,7 @@ function LoginForm() {
       onSubmit={(values, { setErrors }) =>
         userStore
           .login(values)
-          .catch((error) => setErrors({ error: "Invalid email of password" }))
+          .catch(() => setErrors({ error: "Invalid email of password" }))
       }
     >
       {({ handleSubmit, isSubmitting, errors }) => (

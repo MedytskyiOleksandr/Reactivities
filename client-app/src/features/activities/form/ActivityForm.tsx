@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button, Header, Segment } from "semantic-ui-react";
 import { v4 as uuid } from "uuid";
 import * as Yup from "yup";
@@ -20,7 +20,7 @@ function ActivityForm() {
     activityStore;
 
   const { id } = useParams<{ id: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [activity, setActivity] = useState<ActivityFormValues>(
     new ActivityFormValues()
@@ -50,11 +50,11 @@ function ActivityForm() {
         id: uuid(),
       };
       createActivity(newActivity).then(() => {
-        history.push(`/activities/${newActivity.id}`);
+        navigate(`/activities/${newActivity.id}`);
       });
     } else {
       editActivity(activity).then(() => {
-        history.push(`/activities/${activity.id}`);
+        navigate(`/activities/${activity.id}`);
       });
     }
   }
